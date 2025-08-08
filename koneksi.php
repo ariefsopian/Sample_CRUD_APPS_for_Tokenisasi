@@ -5,7 +5,7 @@
  * File ini adalah jantung dari aplikasi yang melakukan beberapa tugas penting:
  * 1. Memuat konfigurasi pusat dari config.php.
  * 2. Memulai dan mengamankan sesi PHP untuk manajemen login.
- * 3. Membuat koneksi ke database.
+ * 3. Membuat koneksi ke database menggunakan gaya Object-Oriented.
  * 4. Menyediakan fungsi-fungsi helper yang digunakan di seluruh aplikasi (misal: is_admin, redirect).
  */
 
@@ -24,7 +24,7 @@ function secure_session_start() {
         error_log("Error: Gagal menginisialisasi sesi (use_only_cookies).");
         exit(); // Hentikan eksekusi jika gagal.
     }
-    
+
     // Mengambil parameter cookie saat ini.
     $cookieParams = session_get_cookie_params();
     // Mengatur parameter cookie sesi dengan opsi keamanan yang sudah didefinisikan.
@@ -38,7 +38,7 @@ function secure_session_start() {
 
     session_name($session_name); // Menetapkan nama sesi.
     session_start(); // Memulai sesi PHP.
-    
+
     // Regenerasi ID sesi secara berkala untuk mencegah serangan 'session fixation'.
     if (!isset($_SESSION['created'])) {
         $_SESSION['created'] = time();
@@ -51,13 +51,13 @@ function secure_session_start() {
 // Memanggil fungsi di atas untuk memulai sesi yang aman setiap kali 'koneksi.php' dimuat.
 secure_session_start();
 
-// 3. Membuat koneksi ke database menggunakan konstanta dari 'config.php'.
-$koneksi = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+// 3. Membuat koneksi ke database menggunakan konstanta dari 'config.php' dengan gaya Object-Oriented.
+$koneksi = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 // Memeriksa apakah koneksi berhasil.
-if (!$koneksi) {
+if ($koneksi->connect_error) { // Memeriksa error dengan gaya Object-Oriented
     // Mencatat error ke log server (tidak ditampilkan ke pengguna) dan menampilkan pesan umum.
-    error_log("Koneksi ke database gagal: " . mysqli_connect_error());
+    error_log("Koneksi ke database gagal: " . $koneksi->connect_error);
     die("Koneksi ke server gagal. Silakan coba beberapa saat lagi.");
 }
 
